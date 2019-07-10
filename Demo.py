@@ -18,6 +18,11 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+import conda
+conda_file_dir = conda.__file__
+conda_dir = conda_file_dir.split("lib")[0]
+proj_lib = os.path.join(os.path.join(conda_dir,"share"),"proj")
+os.environ["PROJ_LIB"] = proj_lib
 from mpl_toolkits.basemap import Basemap
 from natsort import natsorted
 
@@ -275,7 +280,7 @@ class Demonstrate:
         
 if __name__ == "__main__":
     
-    isWindow = True
+    isWindow = False
     
     dataPath = "./demonstration"
     visualPath = "./visualization"
