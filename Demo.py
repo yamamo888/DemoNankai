@@ -127,8 +127,8 @@ class Demonstrate:
     def Heatmap(self,slipVelocity,Times):
         # heatmap 設定
         cmap = "Reds"
-        
-        for i in range(slipVelocity.shape[0]):
+            
+        for i in range(slipVelocity[:5].shape[0]):
             
             plt.close()
             sns.heatmap(slipVelocity[i][np.newaxis],center=slipVelocity.mean(),cmap=cmap,cbar=False)
@@ -248,36 +248,30 @@ class Demonstrate:
         
     #--------------------------------------------------------------------------     
     def Animation(self,nankaimap):
-        # animation
-        fig = plt.figure()
         
-        # 軸削除
-        ax = plt.subplot(1, 1, 1)
-        ax.spines['right'].set_color('None')
-        ax.spines['top'].set_color('None')
-        ax.spines['left'].set_color('None')
-        ax.spines['bottom'].set_color('None')
-        ax.tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off')
-        ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
+        cap = cv2.VideoCapture(0)
+        
+        img_width,img_height = 640,360
+        
+        fourcc = cv2.VideoWriter_fourcc('m','p','4', 'v')
+        video  = cv2.VideoWriter('ImgVideo.mp4', fourcc, 20.0, (img_width, img_height))
         
         # 辞書順->自然順
         nankaimap_list = []
         for path in natsorted(nankaimap):
+            print(path)
             nankaimap_list.append(path)
         
         # 再生画像用ストックリスト
-        images = []
         for i in range(len(nankaimap_list)):
-            tmp = Image.open(nankaimap_list[i])
-            images.append([plt.imshow(tmp, interpolation="spline36")])
-        #animate = animation.ArtistAnimation(fig,images,interval=1)
-        animate = animation.ArtistAnimation(fig,images)
+            img = cv2.imread(nankaimap_list[i])
+            img = cv2.resize(img,(img_width, img_height))
+            video.write(img)
         
-        plt.show()
-        # save by gif
-        animate.save("Nankai_demonstration.gif",writer="imagemagick")
-        
-        
+        # 保存
+        video.release()
+        cap.release()
+        cv2.destroyAllWindows()
         
 if __name__ == "__main__":
     
@@ -338,10 +332,10 @@ if __name__ == "__main__":
         #--------------------- デモ --------------------------------------------
         myDemo = Demonstrate(dataPath,visualPath,maskPath)
         # slipvelocity の heatmap
-        myDemo.Heatmap(slip_velocity,times)
+        #myDemo.Heatmap(slip_velocity,times)
         #-------------------- アニメーション ---------------------------------------
         demoPath = os.path.join(animationPath,imgPath)
         demofiles = glob.glob(demoPath)
     
-        #myDemo.Animation(demofiles)
+        myDemo.Animation(demofiles)
             
